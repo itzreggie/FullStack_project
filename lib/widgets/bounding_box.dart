@@ -110,9 +110,7 @@ class BoundingBoxWidget extends StatefulWidget {
       }
       
       // Only create polygon manager once
-      if (_polygonManager == null) {
-        _polygonManager = await mapController.annotations.createPolygonAnnotationManager();
-      }
+      _polygonManager ??= await mapController.annotations.createPolygonAnnotationManager();
       
       // Create dots for all four corners
       final List<Map<String, double>> squarePositions = [

@@ -143,7 +143,7 @@ class _LocationListState extends State<LocationList> {
                 ),
                 
               // Saved locations
-              ...locations.map((location) => _buildLocationItem(context, location)).toList(),
+              ...locations.map((location) => _buildLocationItem(context, location)),
             ],
           ),
         );

@@ -8,9 +8,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   // Track device states to avoid duplicate notifications
-  static Map<int, bool> _deviceInSafeZoneStatus = {};
-  static Map<int, String> _deviceNames = {};
-  static Map<int, DateTime> _deviceLastChangeTime = {};
+  static final Map<int, bool> _deviceInSafeZoneStatus = {};
+  static final Map<int, String> _deviceNames = {};
+  static final Map<int, DateTime> _deviceLastChangeTime = {};
   static const int _minimumChangeInterval = 30;
   static const double _toleranceMeters = 10.0;
 

@@ -33,16 +33,16 @@ class _MarkerAnimation {
 }
 
 class CustomLocationService {
-  static List<mp.PointAnnotationManager?> _customPointAnnotationManagers = [];
-  static List<mp.PointAnnotation?> _customImageAnnotations = [];
-  static List<mp.CircleAnnotationManager?> _customPulseCircleManagers = [];
-  static List<mp.CircleAnnotation?> _customPulseCircles = [];
+  static final List<mp.PointAnnotationManager?> _customPointAnnotationManagers = [];
+  static final List<mp.PointAnnotation?> _customImageAnnotations = [];
+  static final List<mp.CircleAnnotationManager?> _customPulseCircleManagers = [];
+  static final List<mp.CircleAnnotation?> _customPulseCircles = [];
   static RealtimeChannel? _realtimeSubscription;
   static mp.MapboxMap? _mapController;
-  static Map<int, int> _deviceIdToIndexMap = {};
+  static final Map<int, int> _deviceIdToIndexMap = {};
   
   // Animation-related fields
-  static Map<int, _MarkerAnimation> _markerAnimations = {};
+  static final Map<int, _MarkerAnimation> _markerAnimations = {};
   static const Duration _animationDuration = Duration(seconds: 10);
 
   static Future<void> addCustomImageAnnotations(mp.MapboxMap? mapboxMapController, AnimationController pulseController) async {

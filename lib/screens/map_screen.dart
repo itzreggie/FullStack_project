@@ -601,10 +601,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       );
 
       // Create pulse circle manager if needed
-      if (_pulseCircleManager == null) {
-        _pulseCircleManager = await mapboxMapController?.annotations
+      _pulseCircleManager ??= await mapboxMapController?.annotations
             .createCircleAnnotationManager();
-      }
       
       // Create pulse circle annotation options
       final pulseCircleOptions = mp.CircleAnnotationOptions(
@@ -621,10 +619,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       _pulseCircle = await _pulseCircleManager?.create(pulseCircleOptions);
 
       // Create point annotation manager only once
-      if (_pointAnnotationManager == null) {
-        _pointAnnotationManager = await mapboxMapController?.annotations
+      _pointAnnotationManager ??= await mapboxMapController?.annotations
             .createPointAnnotationManager();
-      }
 
       // Load the circular image using the service
       final Uint8List imageData = await ImageMarkerService.createCircularMarker(
