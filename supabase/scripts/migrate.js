@@ -36,6 +36,9 @@ async function getAppliedMigrations() {
 
 async function migrate() {
     try {
+        if (!supabaseAdmin) {
+            throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+        }
         const files = fs.readdirSync(MIGRATIONS_DIR)
             .filter((file) => file.endsWith('.sql'))
             .sort();

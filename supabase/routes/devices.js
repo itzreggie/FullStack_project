@@ -28,6 +28,9 @@ router.post('/connect', wrap(async (req, res) => {
         return res.status(404).json({ error: 'Your device is not registered. Turn on tracking first.' });
     }
 
+    if (!supabaseAdmin) {
+        throw new Error('SUPABASE_SERVICE_ROLE_KEY is needed to connect devices');
+    }
     const { data: target, error: targetError } = await supabaseAdmin
         .from('device_locations')
         .select('id')
