@@ -1,0 +1,32 @@
+name: Flutter
+
+on:
+  push:
+    branches: [main, 'feature/**']
+    paths-ignore:
+      - 'supabase/**'
+      - '**.md'
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # The app loads .env as an asset, so the file must exist to build.
+      # The tests do not call any service, so it can stay empty.
+      - name: Create empty .env
+        run: touch .env
+
+      - run: flutter pub get
+
+      - run: flutter analyze --no-fatal-infos
+
+      - run: flutter test
