@@ -18,7 +18,8 @@ function requireString(body, field, { maxLength = 200, optional = false } = {}) 
         throw badRequest(`${field} must be a string`);
     }
     const trimmed = value.trim();
-    if (!optional && trimmed.length === 0) {
+    if (trimmed.length === 0) {
+        if (optional) return null;
         throw badRequest(`${field} is required`);
     }
     if (trimmed.length > maxLength) {
