@@ -86,7 +86,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> {
         _location1Lng = null;
       });
       
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Safe zone saved successfully!'),
@@ -95,7 +95,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> {
       );
     } catch (e) {
       debugPrint('Error saving safe zone: $e');
-      if (!context.mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(ApiService.errorText(e, 'Error saving safe zone')),
