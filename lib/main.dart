@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../screens/map_screen.dart';
 import '../screens/Home_screen.dart';
 import '../screens/login_screen.dart';
@@ -89,27 +90,41 @@ class MyApp extends StatelessWidget {
 }
 
 // Shows the login screen until a user is signed in, then the map
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    if (!SupabaseService.isInitialized) {
-      return AppLifecycleObserver(child: const MapScreen());
-    }
+  State<AuthGate> createState() => _AuthGateState();
+}
 
-    return StreamBuilder<AuthState>(
-      stream: AuthService.authStateChanges,
-      builder: (context, snapshot) {
-        if (!AuthService.isSignedIn) {
-          return const LoginScreen();
-        }
-        if (snapshot.data?.event == AuthChangeEvent.signedIn) {
-          TrackingService().initialize();
-        }
-        return AppLifecycleObserver(child: const MapScreen());
-      },
-    );
+class _AuthGateState extends State<AuthGate> {
+  StreamSubscription<AuthState>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!SupabaseService.isInitialized) return;
+
+    _authSubscription = AuthService.authStateChanges.listen((state) {
+      if (state.event == AuthChangeEvent.signedIn) {
+        TrackingService().initialize();
+      }
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (SupabaseService.isInitialized && !AuthService.isSignedIn) {
+      return const LoginScreen();
+    }
+    return AppLifecycleObserver(child: const MapScreen());
   }
 }
 

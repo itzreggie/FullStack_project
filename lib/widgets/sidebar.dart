@@ -5,7 +5,7 @@ import 'package:ahtet/widgets/SideBarElements/sidebar_button.dart';
 import 'package:ahtet/screens/notificationHistory_screen.dart';
 import 'package:ahtet/screens/setting_screen.dart';
 import 'package:ahtet/services/auth_service.dart';
-import 'package:ahtet/services/device_location.dart';
+import 'package:ahtet/services/tracking_service.dart';
 
 class Sidebar extends StatelessWidget {
   final VoidCallback onClose;
@@ -33,7 +33,10 @@ class Sidebar extends StatelessWidget {
 
     if (confirmed != true || !context.mounted) return;
 
-    DeviceLocation.stopTracking();
+    // Turn tracking off while the session is still valid, so the
+    // database update passes the owner policy
+    await TrackingService().setTracking(false);
+    if (!context.mounted) return;
     onClose();
     Navigator.of(context).popUntil((route) => route.isFirst);
     await AuthService.signOut();
