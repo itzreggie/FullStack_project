@@ -95,62 +95,56 @@ class _TaskInputFragmentState extends State<TaskInputFragment> {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    RadioListTile<String>(
-                      title: Text(
-                        'None',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                        ),
-                      ),
-                      value: 'None',
+                    RadioGroup<String>(
                       groupValue: tempSelectedOption,
                       onChanged: (String? value) {
                         setModalState(() {
                           tempSelectedOption = value!;
                         });
                       },
-                      activeColor: Colors.black,
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                    ),
-                    RadioListTile<String>(
-                      title: Text(
-                        'Every Day',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
+                      child: Column(
+                        children: [
+                        RadioListTile<String>(
+                          title: Text(
+                            'None',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          value: 'None',
+                          activeColor: Colors.black,
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
                         ),
-                      ),
-                      value: 'Daily',
-                      groupValue: tempSelectedOption,
-                      onChanged: (String? value) {
-                        setModalState(() {
-                          tempSelectedOption = value!;
-                        });
-                      },
-                      activeColor: Colors.black,
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                    ),
-                    RadioListTile<String>(
-                      title: Text(
-                        'Every Week',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
+                        RadioListTile<String>(
+                          title: Text(
+                            'Every Day',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          value: 'Daily',
+                          activeColor: Colors.black,
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
                         ),
+                        RadioListTile<String>(
+                          title: Text(
+                            'Every Week',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          value: 'Weekly',
+                          activeColor: Colors.black,
+                          contentPadding: EdgeInsets.zero,
+                          dense: true,
+                        ),
+                        ],
                       ),
-                      value: 'Weekly',
-                      groupValue: tempSelectedOption,
-                      onChanged: (String? value) {
-                        setModalState(() {
-                          tempSelectedOption = value!;
-                        });
-                      },
-                      activeColor: Colors.black,
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
                     ),
                     const SizedBox(height: 5),
                     Center(
