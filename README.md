@@ -45,6 +45,29 @@ on a map and get notified when the child enters or leaves a safe zone.
 
 ## How the parts work together
 
+```mermaid
+flowchart LR
+  App["Flutter app"]
+  Api["Express backend"]
+  subgraph supa [Supabase]
+    Auth["Auth"]
+    Db["PostgreSQL with row level security"]
+    Rt["Realtime"]
+    Store["Storage task-images"]
+  end
+  Mapbox["Mapbox maps and geocoding"]
+  Google["Google Places and Directions"]
+
+  App -->|"sign in"| Auth
+  App -->|"reads, routes, tasks"| Db
+  Rt -->|"live device positions"| App
+  App -->|"task photos"| Store
+  App -->|"connect devices, safe zones, with access token"| Api
+  Api -->|"queries as the user"| Db
+  App --> Mapbox
+  App --> Google
+```
+
 The app talks to Supabase directly for reading data and for simple writes
 such as routes and tasks. Row level security policies in the database make
 sure a user only sees their own rows and the devices they are connected to.
@@ -54,6 +77,27 @@ to another device by its code, renaming or removing a connection, and
 creating or deleting safe zones and their borders. The app sends the
 user's Supabase access token with each request, and the backend runs the
 queries as that user, so the same policies apply.
+
+## Database
+
+All tables live in Supabase PostgreSQL and have row level security turned
+on. The SQL is in `supabase/supabase/migrations/`.
+
+| Table | What it holds | Who can use a row |
+| --- | --- | --- |
+| `device_locations` | One row per phone: name, device code, tracking on or off and the last position | The owner. People who are connected to the device can read it |
+| `connected_devices` | A link from your device to a device you follow, with an optional name | The user who made the connection (`owner_id`) |
+| `safe_zone` | Saved places with a name, address and coordinates | The owner |
+| `bounding_box` | The four corners of a safe zone border | The owner of the safe zone |
+| `notifications` | Entered and left events for the history screen | The user who got the notification |
+| `location_list` | Saved routes with transport mode and time range | The owner |
+| `task_list` | Tasks with date, repeat option and photo link | The owner |
+| `task_completions` | Done or not done per day for repeating tasks | The owner of the task |
+| `schema_migrations` | Which migration files have been applied | Only the migrate script |
+
+Task photos are in the public `task-images` Storage bucket. Anyone with
+the link can view a photo, but users can only upload, replace or delete
+files inside a folder named after their own user id.
 
 ## Backend API
 
@@ -117,6 +161,28 @@ exist or belongs to someone else.
   the search name matching
 - npm for the backend packages and scripts
 
+## Development process
+
+**Branches.** `main` always holds working code. New work is done on a
+`feature/<name>` branch, for example `feature/ci` or `feature/ux-fixes`,
+and merged into `main` with `git merge --no-ff`, so every feature shows up
+as one merge commit in the history.
+
+**Commits.** Commit messages follow the usual Git style: a short title in
+the imperative mood, a blank line, and a body that explains what changed
+and why.
+
+**Continuous integration.** Two GitHub Actions workflows run on every push
+to `main` or a feature branch and on pull requests into `main`:
+
+- `flutter.yml` runs `flutter analyze` and `flutter test` when app code
+  changes.
+- `backend.yml` runs `npm ci` and `npm test` when files in `supabase/`
+  change.
+
+**Deployment.** Render deploys the backend again after every push to
+`main`.
+
 ## Project structure
 
 - `lib/main.dart` starts the services and shows the login screen or the map.
@@ -129,11 +195,14 @@ exist or belongs to someone else.
   sidebar, the bounding box editor and the lists.
 - `lib/assets/` holds the images and app icons.
 - `test/` holds the Flutter tests.
+- `.github/workflows/` holds the CI workflows, and `render.yaml` describes
+  the backend service on Render.
 - `supabase/` holds the backend:
   - `index.js` and `app.js` start the Express server and set up the routes.
   - `middleware/` checks access tokens and logs requests.
   - `routes/` has the device and safe zone endpoints.
   - `lib/validate.js` checks request bodies.
+  - `test/` has the backend tests.
   - `supabase/migrations/` has the numbered SQL files for tables and
     policies, and `scripts/migrate.js` runs them in order.
 

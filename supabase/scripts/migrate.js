@@ -17,6 +17,7 @@ async function getAppliedMigrations() {
           name TEXT PRIMARY KEY,
           applied_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
         );
+        ALTER TABLE schema_migrations ENABLE ROW LEVEL SECURITY;
         NOTIFY pgrst, 'reload schema';
     `);
 
