@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/safe_zone_list.dart';
 import 'location_input_fragment.dart';
 import '../services/supabase_service.dart';
+import '../services/api_service.dart';
 
 class SafeHomeScreen extends StatefulWidget {
   const SafeHomeScreen({super.key});
@@ -96,8 +97,8 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> {
       debugPrint('Error saving safe zone: $e');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error saving safe zone'),
+        SnackBar(
+          content: Text(ApiService.errorText(e, 'Error saving safe zone')),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),

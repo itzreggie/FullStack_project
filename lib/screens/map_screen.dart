@@ -17,6 +17,7 @@ import '../widgets/safe_zone_toolbar.dart';
 import '../services/supabase_service.dart';
 import '../services/path_service.dart';
 import '../widgets/bottom_navigation_bar.dart';
+import '../services/api_service.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -1256,8 +1257,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         debugPrint('Error saving bounding box: $e');
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to save safe zone boundary'),
+          SnackBar(
+            content: Text(ApiService.errorText(e, 'Failed to save safe zone boundary')),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),

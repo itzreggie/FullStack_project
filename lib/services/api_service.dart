@@ -16,6 +16,12 @@ class ApiException implements Exception {
 
 // Calls the Express backend with the current Supabase access token
 class ApiService {
+  // The backend message for API errors, or the fallback for anything else
+  static String errorText(Object error, String fallback) {
+    if (error is ApiException) return error.message;
+    return fallback;
+  }
+
   static String get _baseUrl {
     final url = dotenv.env['BACKEND_URL'];
     if (url == null || url.isEmpty) {
