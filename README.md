@@ -1,6 +1,7 @@
 # Ahtet
 
 [![Flutter](https://github.com/itzreggie/FullStack_project/actions/workflows/flutter.yml/badge.svg)](https://github.com/itzreggie/FullStack_project/actions/workflows/flutter.yml)
+[![Backend](https://github.com/itzreggie/FullStack_project/actions/workflows/backend.yml/badge.svg)](https://github.com/itzreggie/FullStack_project/actions/workflows/backend.yml)
 
 Ahtet is a mobile app that helps children and young people with cognitive
 disabilities, including autism, travel and handle daily routines with more
