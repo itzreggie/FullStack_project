@@ -161,6 +161,28 @@ exist or belongs to someone else.
   the search name matching
 - npm for the backend packages and scripts
 
+## Development process
+
+**Branches.** `main` always holds working code. New work is done on a
+`feature/<name>` branch, for example `feature/ci` or `feature/ux-fixes`,
+and merged into `main` with `git merge --no-ff`, so every feature shows up
+as one merge commit in the history.
+
+**Commits.** Commit messages follow the usual Git style: a short title in
+the imperative mood, a blank line, and a body that explains what changed
+and why.
+
+**Continuous integration.** Two GitHub Actions workflows run on every push
+to `main` or a feature branch and on pull requests into `main`:
+
+- `flutter.yml` runs `flutter analyze` and `flutter test` when app code
+  changes.
+- `backend.yml` runs `npm ci` and `npm test` when files in `supabase/`
+  change.
+
+**Deployment.** Render deploys the backend again after every push to
+`main`.
+
 ## Project structure
 
 - `lib/main.dart` starts the services and shows the login screen or the map.
@@ -173,11 +195,14 @@ exist or belongs to someone else.
   sidebar, the bounding box editor and the lists.
 - `lib/assets/` holds the images and app icons.
 - `test/` holds the Flutter tests.
+- `.github/workflows/` holds the CI workflows, and `render.yaml` describes
+  the backend service on Render.
 - `supabase/` holds the backend:
   - `index.js` and `app.js` start the Express server and set up the routes.
   - `middleware/` checks access tokens and logs requests.
   - `routes/` has the device and safe zone endpoints.
   - `lib/validate.js` checks request bodies.
+  - `test/` has the backend tests.
   - `supabase/migrations/` has the numbered SQL files for tables and
     policies, and `scripts/migrate.js` runs them in order.
 
