@@ -1245,6 +1245,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         // Reload bounding boxes from database to ensure they display correctly
         await _loadAndDisplayBoundingBoxes();
         
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Safe zone boundary saved successfully'),
@@ -1253,6 +1254,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         );
       } catch (e) {
         debugPrint('Error saving bounding box: $e');
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to save safe zone boundary'),

@@ -22,6 +22,7 @@ class SafeHomeButton extends StatelessWidget {
               result.containsKey('location_lat') &&
               result.containsKey('location_lng')) {
             
+            if (!context.mounted) return;
             final mapScreen = context.findAncestorWidgetOfExactType<MapScreen>();
             if (mapScreen != null) {
               MapScreen.flyToLocation(
