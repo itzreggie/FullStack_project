@@ -726,7 +726,7 @@ class _SettingpageState extends State<Settingpage> {
                       Switch(
                         value: _isTrackingEnabled,
                         onChanged: _toggleTracking,
-                        activeColor: Colors.black,
+                        activeThumbColor: Colors.black,
                         inactiveThumbColor: Colors.grey,
                         inactiveTrackColor: Colors.grey[300],
                       ),

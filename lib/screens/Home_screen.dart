@@ -514,9 +514,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         width: 1.5,
                                       ),
                                       checkColor: Colors.white,
-                                      fillColor: MaterialStateProperty.resolveWith<Color>(
-                                        (Set<MaterialState> states) {
-                                          if (states.contains(MaterialState.selected)) {
+                                      fillColor: WidgetStateProperty.resolveWith<Color>(
+                                        (Set<WidgetState> states) {
+                                          if (states.contains(WidgetState.selected)) {
                                             return Colors.black;
                                           }
                                           return Colors.transparent;
