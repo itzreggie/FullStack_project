@@ -45,6 +45,29 @@ on a map and get notified when the child enters or leaves a safe zone.
 
 ## How the parts work together
 
+```mermaid
+flowchart LR
+  App["Flutter app"]
+  Api["Express backend"]
+  subgraph supa [Supabase]
+    Auth["Auth"]
+    Db["PostgreSQL with row level security"]
+    Rt["Realtime"]
+    Store["Storage task-images"]
+  end
+  Mapbox["Mapbox maps and geocoding"]
+  Google["Google Places and Directions"]
+
+  App -->|"sign in"| Auth
+  App -->|"reads, routes, tasks"| Db
+  Rt -->|"live device positions"| App
+  App -->|"task photos"| Store
+  App -->|"connect devices, safe zones, with access token"| Api
+  Api -->|"queries as the user"| Db
+  App --> Mapbox
+  App --> Google
+```
+
 The app talks to Supabase directly for reading data and for simple writes
 such as routes and tasks. Row level security policies in the database make
 sure a user only sees their own rows and the devices they are connected to.
