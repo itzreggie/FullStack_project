@@ -1,6 +1,6 @@
 import 'dart:async';
 import '../screens/map_screen.dart';
-import '../screens/Home_screen.dart';
+import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent, AuthState;
