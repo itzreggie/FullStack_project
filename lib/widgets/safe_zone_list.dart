@@ -242,8 +242,8 @@ class _SafeZoneListState extends State<SafeZoneList> {
       debugPrint('Error deleting safe zone: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error deleting safe zone'),
+          SnackBar(
+            content: Text(ApiService.errorText(e, 'Error deleting safe zone')),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),

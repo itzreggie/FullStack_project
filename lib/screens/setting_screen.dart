@@ -132,6 +132,7 @@ class _SettingpageState extends State<Settingpage> {
       builder: (BuildContext context) {
         String deviceCode = '';
         String errorMessage = '';
+        bool isConnecting = false;
         
         // If accordion is expanded, close it in the background
         if (_isAccordionExpanded) {
@@ -287,11 +288,16 @@ class _SettingpageState extends State<Settingpage> {
                         
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () async {
+                            onPressed: isConnecting ? null : () async {
                               String cleanCode = deviceCode.replaceAll('-', '');
                               if (cleanCode.length != 6) {
                                 return;
                               }
+
+                              setState(() {
+                                isConnecting = true;
+                                errorMessage = '';
+                              });
                               
                               try {
                                 // The backend finds the other device, which this user cannot read directly
@@ -301,8 +307,10 @@ class _SettingpageState extends State<Settingpage> {
                                     targetCode: cleanCode,
                                   );
                                 } on ApiException catch (e) {
+                                  if (!context.mounted) return;
                                   setState(() {
                                     errorMessage = e.message;
+                                    isConnecting = false;
                                   });
                                   return;
                                 }
@@ -328,6 +336,11 @@ class _SettingpageState extends State<Settingpage> {
                                 }
                               } catch (e) {
                                 debugPrint('Error connecting to device: $e');
+                                if (!context.mounted) return;
+                                setState(() {
+                                  errorMessage = 'Could not connect. Check your internet connection and try again.';
+                                  isConnecting = false;
+                                });
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -338,13 +351,22 @@ class _SettingpageState extends State<Settingpage> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text(
-                              'Connect',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                            child: isConnecting
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Connect',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],

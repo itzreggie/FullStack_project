@@ -468,6 +468,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                     );
                                     
                                     // Show success message
+                                    if (!context.mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Route saved successfully!'),
@@ -488,6 +489,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
                                     
                                   } catch (e) {
                                     debugPrint('Error saving route: $e');
+                                    if (!context.mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text('Error saving route: $e'),

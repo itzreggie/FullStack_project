@@ -182,7 +182,7 @@ class MapboxSearchService {
 
       return allResults.take(25).toList();
     } catch (e) {
-      print('Error in comprehensive search: $e');
+      debugPrint('Error in comprehensive search: $e');
       // Fallback to Mapbox only if Google fails
       return await _searchMapbox(query);
     }
@@ -345,7 +345,7 @@ class MapboxSearchService {
 
       return allResults;
     } catch (e) {
-      print('Error in Mapbox search: $e');
+      debugPrint('Error in Mapbox search: $e');
       return [];
     }
   }
@@ -380,7 +380,7 @@ class MapboxSearchService {
               .map((result) => MapboxSearchResult.fromGooglePlaces(result))
               .toList();
         } else {
-          print('Google Places API error: ${data['status']}');
+          debugPrint('Google Places API error: ${data['status']}');
           return [];
         }
       } else {
@@ -389,7 +389,7 @@ class MapboxSearchService {
         );
       }
     } catch (e) {
-      print('Error in Google Places search: $e');
+      debugPrint('Error in Google Places search: $e');
       return [];
     }
   }
@@ -521,7 +521,7 @@ class MapboxSearchService {
 
       return allResults.take(20).toList();
     } catch (e) {
-      print('Error in location-biased search: $e');
+      debugPrint('Error in location-biased search: $e');
       return [];
     }
   }
@@ -565,7 +565,7 @@ class MapboxSearchService {
       }
       return [];
     } catch (e) {
-      print('Error in Mapbox location-biased search: $e');
+      debugPrint('Error in Mapbox location-biased search: $e');
       return [];
     }
   }
@@ -608,7 +608,7 @@ class MapboxSearchService {
       }
       return [];
     } catch (e) {
-      print('Error in Google Places location-biased search: $e');
+      debugPrint('Error in Google Places location-biased search: $e');
       return [];
     }
   }
@@ -625,7 +625,7 @@ class MapboxSearchService {
     try {
       final accessToken = dotenv.env['MAPBOX_ACCESS_TOKEN'];
       if (accessToken == null) {
-        print('Mapbox access token not found');
+        debugPrint('Mapbox access token not found');
         return null;
       }
 
@@ -643,11 +643,11 @@ class MapboxSearchService {
         }
         return null;
       } else {
-        print('Failed to reverse geocode: ${response.statusCode}');
+        debugPrint('Failed to reverse geocode: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error in reverse geocoding: $e');
+      debugPrint('Error in reverse geocoding: $e');
       return null;
     }
   }
