@@ -8,7 +8,13 @@ const safeZonesRouter = require('./routes/safeZones');
 const app = express();
 
 app.use(requestLogger);
-app.use(cors());
+// A comma separated list of allowed origins, or every origin when unset.
+// The mobile app does not send an Origin header, so this only limits browsers.
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length > 0 ? allowedOrigins : '*' }));
 app.use(express.json({ limit: '100kb' }));
 
 app.get('/health', (req, res) => {

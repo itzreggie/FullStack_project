@@ -197,6 +197,34 @@ exist or belongs to someone else.
    applied yet and records it in a `schema_migrations` table. It calls an
    `execute_sql` function, which has to exist in your Supabase project.
 
+6. Run the backend tests with:
+
+   ```
+   npm test
+   ```
+
+## Deploying the backend
+
+The backend is set up for [Render](https://render.com) with the
+`render.yaml` file in the project root.
+
+1. In Render, choose **New > Blueprint** and connect the GitHub repository.
+   Render reads `render.yaml` and creates a free web service from the
+   `supabase/` folder.
+2. Fill in the secret values when Render asks for them:
+   - `SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY`
+     from your Supabase project settings
+   - `CORS_ORIGIN`, which can stay empty because the mobile app does not
+     send an origin
+3. Wait for the first deploy, then open `https://<service name>.onrender.com/health`
+   to check that it runs.
+4. Put that address in `BACKEND_URL` in the app's `.env` and build the app
+   again.
+
+Every push to `main` deploys the backend again. On the free plan the
+service sleeps after some time without requests, so the first request
+after a break can take up to a minute.
+
 ## Author
 
 Rejoice Ekong
