@@ -572,12 +572,14 @@ class _TaskInputFragmentState extends State<TaskInputFragment> {
                       imageFile: _selectedImage,
                     );
 
+                    if (!context.mounted) return;
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       '/home',
                       (route) => false,
                     );
                   } catch (e) {
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Error saving task: ${e.toString()}'),

@@ -334,6 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         await SupabaseService.deleteTask(task['id']);
                                         _loadTasksForSelectedDate();
                                       } catch (e) {
+                                        if (!context.mounted) return;
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
                                             content: Text('Error deleting task: ${e.toString()}'),
