@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS aught_table (
 
 ALTER TABLE aught_table ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable all operations for authenticated users" ON aught_table;
 CREATE POLICY "Enable all operations for authenticated users" ON aught_table
   FOR ALL USING (true);
 
@@ -29,6 +30,7 @@ CREATE TABLE IF NOT EXISTS location_list (
 
 ALTER TABLE location_list ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable all operations for users" ON location_list;
 CREATE POLICY "Enable all operations for users" ON location_list
   FOR ALL USING (true);
 
@@ -44,6 +46,7 @@ CREATE TABLE IF NOT EXISTS safe_zone (
 
 ALTER TABLE safe_zone ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable all operations for safe zone" ON safe_zone;
 CREATE POLICY "Enable all operations for safe zone" ON safe_zone
   FOR ALL USING (true);
 
@@ -68,6 +71,7 @@ CREATE INDEX IF NOT EXISTS idx_bounding_box_safe_zone_id ON bounding_box(safe_zo
 
 ALTER TABLE bounding_box ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable all operations for bounding box" ON bounding_box;
 CREATE POLICY "Enable all operations for bounding box" ON bounding_box
   FOR ALL USING (true);
 
@@ -88,6 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_device_locations_generated_id ON device_locations
 CREATE INDEX IF NOT EXISTS idx_device_locations_timestamp ON device_locations(timestamp);
 
 ALTER TABLE device_locations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable all operations for device_locations" ON device_locations;
 CREATE POLICY "Enable all operations for device_locations" ON device_locations
   FOR ALL USING (true);
 
@@ -108,10 +113,12 @@ CREATE INDEX IF NOT EXISTS idx_connected_devices_generated_id ON connected_devic
 CREATE INDEX IF NOT EXISTS idx_connected_devices_connected_device_id ON connected_devices(connected_device_id);
 
 ALTER TABLE connected_devices ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable all operations for connected_devices" ON connected_devices;
 CREATE POLICY "Enable all operations for connected_devices" ON connected_devices
   FOR ALL USING (true);
 
 -- Add a unique constraint to prevent duplicate connections
+ALTER TABLE connected_devices DROP CONSTRAINT IF EXISTS unique_device_connection;
 ALTER TABLE connected_devices ADD CONSTRAINT unique_device_connection
   UNIQUE (device_location_id, generated_id);
 
@@ -133,6 +140,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_connected_device_id ON notification
 CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable all operations for notifications" ON notifications;
 CREATE POLICY "Enable all operations for notifications" ON notifications
   FOR ALL USING (true);
 
@@ -152,6 +160,7 @@ CREATE INDEX IF NOT EXISTS idx_task_list_task_date ON task_list(task_date);
 CREATE INDEX IF NOT EXISTS idx_task_list_created_at ON task_list(created_at);
 
 ALTER TABLE task_list ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable all operations for task list" ON task_list;
 CREATE POLICY "Enable all operations for task list" ON task_list
   FOR ALL USING (true);
 
@@ -171,6 +180,7 @@ CREATE INDEX IF NOT EXISTS idx_task_completions_completion_date ON task_completi
 CREATE INDEX IF NOT EXISTS idx_task_completions_unique ON task_completions(original_task_id, completion_date);
 
 ALTER TABLE task_completions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Enable all operations for task completions" ON task_completions;
 CREATE POLICY "Enable all operations for task completions" ON task_completions
   FOR ALL USING (true);
 

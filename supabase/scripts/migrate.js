@@ -17,7 +17,11 @@ async function getAppliedMigrations() {
           name TEXT PRIMARY KEY,
           applied_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
         );
+        NOTIFY pgrst, 'reload schema';
     `);
+
+    // PostgREST reloads its schema cache in the background
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const { data, error } = await supabaseAdmin
         .from('schema_migrations')
