@@ -1,8 +1,8 @@
-import 'package:ahtet/screens/contactUs_screen.dart';
-import 'package:ahtet/screens/policyOfPrivacy_screen.dart';
+import 'package:ahtet/screens/contact_us_screen.dart';
+import 'package:ahtet/screens/policy_of_privacy_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ahtet/widgets/SideBarElements/sidebar_button.dart';
-import 'package:ahtet/screens/notificationHistory_screen.dart';
+import 'package:ahtet/screens/notification_history_screen.dart';
 import 'package:ahtet/screens/setting_screen.dart';
 import 'package:ahtet/services/auth_service.dart';
 import 'package:ahtet/services/tracking_service.dart';
