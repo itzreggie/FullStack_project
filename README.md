@@ -78,6 +78,27 @@ creating or deleting safe zones and their borders. The app sends the
 user's Supabase access token with each request, and the backend runs the
 queries as that user, so the same policies apply.
 
+## Database
+
+All tables live in Supabase PostgreSQL and have row level security turned
+on. The SQL is in `supabase/supabase/migrations/`.
+
+| Table | What it holds | Who can use a row |
+| --- | --- | --- |
+| `device_locations` | One row per phone: name, device code, tracking on or off and the last position | The owner. People who are connected to the device can read it |
+| `connected_devices` | A link from your device to a device you follow, with an optional name | The user who made the connection (`owner_id`) |
+| `safe_zone` | Saved places with a name, address and coordinates | The owner |
+| `bounding_box` | The four corners of a safe zone border | The owner of the safe zone |
+| `notifications` | Entered and left events for the history screen | The user who got the notification |
+| `location_list` | Saved routes with transport mode and time range | The owner |
+| `task_list` | Tasks with date, repeat option and photo link | The owner |
+| `task_completions` | Done or not done per day for repeating tasks | The owner of the task |
+| `schema_migrations` | Which migration files have been applied | Only the migrate script |
+
+Task photos are in the public `task-images` Storage bucket. Anyone with
+the link can view a photo, but users can only upload, replace or delete
+files inside a folder named after their own user id.
+
 ## Backend API
 
 All `/api` routes need an `Authorization: Bearer <access token>` header.
