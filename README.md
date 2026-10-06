@@ -8,12 +8,20 @@ on a map and get notified when the child enters or leaves a safe zone.
 ## Current state
 
 The project is at the starting point. It contains the Flutter project setup
-for Android, iOS, web, Windows, macOS and Linux, and the default starter app.
-Features will be added step by step.
+for Android, iOS, web, Windows, macOS and Linux, the default starter app, and
+a small Node.js backend with a health check endpoint. Features will be added
+step by step.
 
 ## Tech stack
 
 - Flutter and Dart for the mobile app
+- Node.js and Express for the backend server
+- Supabase (PostgreSQL) for the database
+
+## Project structure
+
+- The Flutter app sits at the root of the repository.
+- `supabase/` holds the backend: the Express server and the Supabase client.
 
 ## Running the app
 
@@ -32,6 +40,21 @@ Features will be added step by step.
    flutter pub get
    flutter run
    ```
+
+## Running the backend
+
+1. Install [Node.js](https://nodejs.org/).
+2. Copy `supabase/.env.example` to `supabase/.env` and fill in the keys from
+   your Supabase project settings.
+3. Install the packages and start the server:
+
+   ```
+   cd supabase
+   npm install
+   npm start
+   ```
+
+4. Open http://localhost:3000/health to check that the server is running.
 
 ## Author
 
