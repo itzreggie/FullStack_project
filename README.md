@@ -34,7 +34,16 @@ step by step.
    cd FullStack_project
    ```
 
-3. Get the packages and start the app on a connected device or emulator:
+3. Copy `.env.example` to `.env` in the project root and fill in the keys:
+
+   - `MAPBOX_ACCESS_TOKEN` from your Mapbox account
+   - `GOOGLE_PLACES_API_KEY` from Google Cloud
+   - `SUPABASE_URL` and `SUPABASE_ANON_KEY` from your Supabase project settings
+
+   The app bundles `.env` as an asset, so the file has to exist before you
+   build. It is listed in `.gitignore` to keep the keys out of the repository.
+
+4. Get the packages and start the app on a connected device or emulator:
 
    ```
    flutter pub get
