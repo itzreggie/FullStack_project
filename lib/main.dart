@@ -6,6 +6,7 @@ import 'services/supabase_service.dart';
 import 'services/tracking_service.dart';
 import 'services/device_location.dart';
 import 'services/background_location_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   // This needs to be called before any platform channels are accessed
@@ -32,6 +33,10 @@ void main() async {
     await BackgroundLocationService.initializeService();
     debugPrint('Background location service initialized');
     
+    // Initialize notification service
+    await NotificationService.initialize();
+    debugPrint('Notification service initialized');
+    
     // Try to initialize Supabase but don't block app launch if it fails
     try {
       await SupabaseService.initialize();
@@ -56,7 +61,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -72,9 +76,43 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const MapScreen(),
-        '/map': (context) => const MapScreen(),
+        '/': (context) => AppLifecycleObserver(child: const MapScreen()),
+        '/map': (context) => AppLifecycleObserver(child: const MapScreen()),
       },
     );
+  }
+}
+
+class AppLifecycleObserver extends StatefulWidget {
+  final Widget child;
+  
+  const AppLifecycleObserver({super.key, required this.child});
+
+  @override
+  State<AppLifecycleObserver> createState() => _AppLifecycleObserverState();
+}
+
+class _AppLifecycleObserverState extends State<AppLifecycleObserver> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    NotificationService.handleAppLifecycleChange(state);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
