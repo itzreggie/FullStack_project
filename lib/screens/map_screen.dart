@@ -1,16 +1,34 @@
 // I am using Mapbox Maps Flutter SDK version 2.8.0.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as gl;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import '../widgets/location_button.dart';
+import '../services/image_marker_service.dart';
+import '../services/custom_location_service.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
   static _MapScreenState? _instance;
+  
+  static void refreshCustomImageAnnotations() {
+  if (_instance != null && _instance!.mapboxMapController != null) {
+    CustomLocationService.addCustomImageAnnotations(
+      _instance!.mapboxMapController,
+      _instance!._pulseAnimationController,
+    );
+  }
+}
+
+  static void removeCustomImageAnnotation(int deviceId) {
+  if (_instance != null && _instance!.mapboxMapController != null) {
+    CustomLocationService.removeDeviceAnnotation(deviceId);
+  }
+}
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -22,6 +40,17 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   bool _hasLocationPermission = false;
   bool _initialLocationRequested = false;
   
+  // Add these variables to your class state
+  late AnimationController _pulseAnimationController;
+  mp.CircleAnnotationManager? _pulseCircleManager;
+  mp.CircleAnnotation? _pulseCircle;
+
+  mp.PointAnnotationManager? _pointAnnotationManager;
+  mp.PointAnnotation? _userImageAnnotation;
+  mp.PointAnnotationManager? _greenDotManager;
+  Timer? _positionUpdateTimer;
+  Timer? _zoomCheckTimer; // Add this new timer for zoom checking
+
   // Get current style URI based on time
   String _getCurrentStyleUri() {
     final now = DateTime.now();
@@ -46,11 +75,27 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     MapScreen._instance = this;
+    // Initialize pulse animation controller
+    _pulseAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat();
+    
+    // Add listener to update pulse animation
+    _pulseAnimationController.addListener(_updatePulseEffect);
   }
 
   @override
   void dispose() {
     userPositionStream?.cancel();
+    _positionUpdateTimer?.cancel();
+    _zoomCheckTimer?.cancel();
+    _pulseAnimationController.dispose();
+    // Clean up annotation resources
+    _pointAnnotationManager = null;
+    _userImageAnnotation = null;
+    _pulseCircleManager = null;
+    CustomLocationService.dispose();
     super.dispose();
   }
 
@@ -158,6 +203,172 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         await Future.delayed(const Duration(milliseconds: 500));
         await _requestLocationAndCenter();
       }
+    }
+
+    // Add image annotation at current location
+    await _addImageAnnotation();
+    
+    await CustomLocationService.addCustomImageAnnotations(mapboxMapController, _pulseAnimationController);
+  }
+
+  Future<void> _addImageAnnotation() async {
+    if (mapboxMapController == null) return;
+
+    try {
+      // Get current location
+      final position = await gl.Geolocator.getCurrentPosition(
+        desiredAccuracy: gl.LocationAccuracy.high,
+      );
+
+      // Create pulse circle manager if needed
+      if (_pulseCircleManager == null) {
+        _pulseCircleManager = await mapboxMapController?.annotations
+            .createCircleAnnotationManager();
+      }
+      
+      // Create pulse circle annotation options
+      final pulseCircleOptions = mp.CircleAnnotationOptions(
+        geometry: mp.Point(
+          coordinates: mp.Position(position.longitude, position.latitude),
+        ),
+        circleRadius: 15.0,
+        circleColor: 0xFF007AFF, // Blue color
+        circleOpacity: 0.7,
+        circleStrokeWidth: 0, // No stroke
+      );
+      
+      // Create pulse circle annotation FIRST
+      _pulseCircle = await _pulseCircleManager?.create(pulseCircleOptions);
+
+      // Create point annotation manager only once
+      if (_pointAnnotationManager == null) {
+        _pointAnnotationManager = await mapboxMapController?.annotations
+            .createPointAnnotationManager();
+      }
+
+      // Load the circular image using the service
+      final Uint8List imageData = await ImageMarkerService.createCircularMarker(
+        assetPath: "lib/assets/andriii.jpg",
+        size: 600,
+      );
+
+      // Create point annotation options (no vertical offset)
+      final pointAnnotationOptions = mp.PointAnnotationOptions(
+        image: imageData,
+        iconSize: 0.3,
+        geometry: mp.Point(
+          coordinates: mp.Position(position.longitude, position.latitude),
+        ),
+      );
+
+      // Create the image annotation SECOND (will be on top)
+      _userImageAnnotation = await _pointAnnotationManager?.create(
+        pointAnnotationOptions,
+      );
+
+      debugPrint(
+        'Image annotation created at: ${position.latitude}, ${position.longitude}',
+      );
+    } catch (e) {
+      debugPrint('Error adding image annotation: $e');
+    }
+  }
+
+  // Add this new method to check zoom level and update visibility
+  Future<void> _checkZoomAndUpdateVisibility() async {
+    if (_pointAnnotationManager == null ||
+        _userImageAnnotation == null ||
+        mapboxMapController == null) {
+      return;
+    }
+
+    try {
+      // Get current camera state to check zoom level
+      final cameraState = await mapboxMapController!.getCameraState();
+      final currentZoom = cameraState.zoom;
+
+      // Hide image annotation when zoomed out beyond ~1km scale (zoom level 12)
+      // Show it when zoomed in closer than that
+      if (currentZoom < 9.0) {
+        // Zoomed out - hide the image annotation
+        if (_userImageAnnotation!.iconOpacity != 0.0) {
+          _userImageAnnotation!.iconOpacity = 0.0; // Make it invisible
+          await _pointAnnotationManager!.update(_userImageAnnotation!);
+          debugPrint('Image hidden at zoom: $currentZoom');
+        }
+      } else {
+        // Zoomed in - show the image annotation
+        if (_userImageAnnotation!.iconOpacity != 1.0) {
+          _userImageAnnotation!.iconOpacity = 1.0; // Make it visible
+          await _pointAnnotationManager!.update(_userImageAnnotation!);
+          debugPrint('Image shown at zoom: $currentZoom');
+        }
+      }
+      
+      // Also check custom location visibility
+      await CustomLocationService.checkCustomZoomAndUpdateVisibility(mapboxMapController);
+    } catch (e) {
+      debugPrint('Error checking zoom and updating visibility: $e');
+    }
+  }
+
+  Future<void> _updateImageAnnotationPosition(gl.Position position) async {
+    if (_pointAnnotationManager == null || _userImageAnnotation == null) {
+      debugPrint('Cannot update annotation: manager or annotation is null');
+      return;
+    }
+
+    try {
+      // Update the annotation geometry directly
+      _userImageAnnotation!.geometry = mp.Point(
+        coordinates: mp.Position(position.longitude, position.latitude),
+      );
+
+      // Update the annotation on the map
+      await _pointAnnotationManager!.update(_userImageAnnotation!);
+      
+      // Also update pulse circle position if it exists
+      if (_pulseCircle != null && _pulseCircleManager != null) {
+        _pulseCircle!.geometry = mp.Point(
+          coordinates: mp.Position(position.longitude, position.latitude),
+        );
+        await _pulseCircleManager!.update(_pulseCircle!);
+      }
+
+      debugPrint(
+        'Updated image position to: ${position.latitude}, ${position.longitude}',
+      );
+    } catch (e) {
+      debugPrint('Error updating image annotation position: $e');
+    }
+  }
+
+  // Add this method to update the pulse effect
+  void _updatePulseEffect() {
+    if (_pulseCircle == null || _pulseCircleManager == null || mapboxMapController == null) return;
+    
+    try {
+      // Calculate pulse size and opacity based on animation value
+      // As animation progresses, make circle larger and more transparent
+      final animationValue = _pulseAnimationController.value;
+      final baseRadius = 15.0; // Base radius of image
+      final maxRadius = 45.0;  
+      
+      // Increase radius and decrease opacity as animation progresses
+      final currentRadius = baseRadius + (maxRadius - baseRadius) * animationValue;
+      final currentOpacity = 1.0 - animationValue; // Fade out as it expands
+      
+      // Update circle properties
+      _pulseCircle!.circleRadius = currentRadius;
+      _pulseCircle!.circleOpacity = currentOpacity;
+      _pulseCircle!.circleColor = 0xFF007AFF;
+      
+      _pulseCircleManager!.update(_pulseCircle!);
+      
+      // Update custom pulse effect as well
+      CustomLocationService.updateCustomPulseEffect(_pulseAnimationController);
+    } catch (e) {
+      debugPrint('Error updating pulse effect: $e');
     }
   }
 
@@ -473,8 +684,35 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             debugPrint(
               'New position received: ${position.latitude}, ${position.longitude}',
             );
+
+            // Keep only the image annotation position update
+            _updateImageAnnotationPosition(position);
           }
         });
+
+    // Also set up a more frequent timer to get current position
+    _positionUpdateTimer?.cancel();
+    _positionUpdateTimer = Timer.periodic(const Duration(seconds: 2), (
+      timer,
+    ) async {
+      try {
+        final position = await gl.Geolocator.getCurrentPosition(
+          desiredAccuracy: gl.LocationAccuracy.high,
+        );
+        _updateImageAnnotationPosition(position);
+      } catch (e) {
+        debugPrint('Error getting current position: $e');
+      }
+    });
+
+    // Add a timer specifically for checking zoom level changes
+    _zoomCheckTimer?.cancel();
+    _zoomCheckTimer = Timer.periodic(const Duration(milliseconds: 500), (
+      timer,
+    ) async {
+      await _checkZoomAndUpdateVisibility();
+    });
+
     debugPrint('Position tracking setup complete');
   }
 }
