@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as gl;
@@ -9,12 +10,14 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
 import '../widgets/location_button.dart';
 import '../widgets/directions_button.dart';
 import '../widgets/safehome_button.dart';
+import '../widgets/sidebar.dart';
 import '../services/image_marker_service.dart';
 import '../services/custom_location_service.dart';
 import '../widgets/bounding_box.dart';
 import '../widgets/safe_zone_toolbar.dart';
 import '../services/supabase_service.dart';
 import '../services/path_service.dart';
+import '../widgets/bottom_navigation_bar.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -74,6 +77,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   StreamSubscription? userPositionStream;
   bool _hasLocationPermission = false;
   bool _initialLocationRequested = false;
+  bool _isSidebarOpen = false;
   bool _isInSafeZoneMode = false;
   bool _isPanDisabled = false; // Pan is enabled by default
   
@@ -86,6 +90,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   String? _navigationSourceName;
   String? _navigationDestName;
   
+  late AnimationController _sidebarAnimationController;
+  late Animation<Offset> _sidebarSlideAnimation;
+
   // Add these variables to your class state
   late AnimationController _pulseAnimationController;
   mp.CircleAnnotationManager? _pulseCircleManager;
@@ -121,6 +128,23 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     MapScreen._instance = this;
+    // Initialize sidebar animation controller
+    _sidebarAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _sidebarSlideAnimation =
+        Tween<Offset>(
+          begin: const Offset(-1.0, 0.0), // Start from left (off-screen)
+          end: Offset.zero, // End at normal position
+        ).animate(
+          CurvedAnimation(
+            parent: _sidebarAnimationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+    
     // Initialize pulse animation controller
     _pulseAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
@@ -136,6 +160,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     userPositionStream?.cancel();
     _positionUpdateTimer?.cancel();
     _zoomCheckTimer?.cancel();
+    _sidebarAnimationController.dispose();
     _pulseAnimationController.dispose();
     // Clean up annotation resources
     _pointAnnotationManager = null;
@@ -143,6 +168,26 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     _pulseCircleManager = null;
     CustomLocationService.dispose();
     super.dispose();
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarOpen = !_isSidebarOpen;
+    });
+
+    if (_isSidebarOpen) {
+      _sidebarAnimationController.forward();
+    } else {
+      _sidebarAnimationController.reverse();
+    }
+  }
+
+  void _closeSidebar() {
+    _sidebarAnimationController.reverse().then((_) {
+      setState(() {
+        _isSidebarOpen = false;
+      });
+    });
   }
 
   @override
@@ -288,6 +333,41 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
+
+            if (!_isInNavigationMode)
+              Positioned(
+                top: 50,
+                left: 20,
+                child: GestureDetector(
+                  onTap: _toggleSidebar,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Image.asset(
+                        'lib/assets/sidebarthick.jpg',
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
+                        color: Colors.grey[600],
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ] else ...[
             Positioned(
               right: 10,
@@ -305,8 +385,25 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               ),
             ),
           ],
+
+          if (_isSidebarOpen && !_isInSafeZoneMode && !_isInNavigationMode)
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _closeSidebar,
+                child: Container(
+                  color: Colors.black.withOpacity(0.3),
+                ),
+              ),
+            ),
+
+          if (_isSidebarOpen && !_isInSafeZoneMode && !_isInNavigationMode)
+            SlideTransition(
+              position: _sidebarSlideAnimation,
+              child: Sidebar(onClose: _closeSidebar),
+            ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNavigationBar(currentIndex: 0),
     );
   }
 
@@ -314,6 +411,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     setState(() {
       mapboxMapController = controller;
     });
+
 
     // Set camera bounds with maximum zoom limit
     await mapboxMapController?.setBounds(
@@ -389,6 +487,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     // Add image annotation at current location
     await _addImageAnnotation();
     
+
     await CustomLocationService.addCustomImageAnnotations(mapboxMapController, _pulseAnimationController);
     
     // Load and display saved bounding boxes from database
@@ -998,6 +1097,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
     debugPrint('Position tracking setup complete');
   }
+
 
   void flyToSafeZone(double latitude, double longitude, String locationName, {int? safeZoneId}) async {
     if (mapboxMapController != null) {
