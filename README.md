@@ -29,15 +29,59 @@ on a map and get notified when the child enters or leaves a safe zone.
 
 ## Tech stack
 
-- Flutter and Dart for the mobile app
-- Mapbox Maps Flutter for the map, and Mapbox geocoding with Google Places
-  for place search
-- Google Directions API for routes
-- Geolocator and Flutter Background Service for location tracking
-- Flutter Local Notifications for safe zone alerts
-- Supabase (PostgreSQL, Realtime and Storage) for data, live location
-  updates and task images
-- Node.js and Express for the backend server
+| Part | Technology |
+| --- | --- |
+| Mobile app | Flutter and Dart (Dart SDK 3.8 or newer) |
+| Backend server | Node.js with Express |
+| Database | Supabase (PostgreSQL), with Realtime and Storage |
+| Maps and places | Mapbox, Google Places and Google Directions |
+
+## Libraries used in the app
+
+| Package | Version | What it is used for |
+| --- | --- | --- |
+| `mapbox_maps_flutter` | ^2.8.0 | The map, custom day and night styles, markers, safe zone polygons and route dots |
+| `geolocator` | ^14.0.0 | Location permission, the current position and the position stream |
+| `flutter_background_service` | ^5.1.0 | Sending the position to Supabase while the app is closed |
+| `supabase_flutter` | ^2.1.0 | Reading and writing all app data, Realtime updates for device positions and uploading task photos |
+| `flutter_local_notifications` | ^19.2.1 | Safe zone entry and exit alerts and the background tracking notice |
+| `flutter_dotenv` | ^5.2.1 | Loading the API keys from `.env` |
+| `http` | ^1.1.0 | Calls to Mapbox geocoding, Google Places and Google Directions |
+| `device_info_plus` | ^9.1.1 | The device name and hardware id |
+| `shared_preferences` | ^2.2.2 | Keeping the generated device code and device info on the phone |
+| `image_picker` | ^1.1.2 | Taking or choosing a photo for a task |
+| `intl` | ^0.19.0 | Formatting the time of each event in the notification history |
+
+`permission_handler`, `google_polyline_algorithm` and `cupertino_icons` are
+listed in `pubspec.yaml` but are not used yet. Location permission goes
+through Geolocator, and route polylines are decoded by our own code in
+`path_service.dart`.
+
+## Libraries used in the backend
+
+| Package | Version | What it is used for |
+| --- | --- | --- |
+| `express` | ^4.18.2 | The HTTP server and the `/health` endpoint |
+| `cors` | ^2.8.5 | Allowing requests from other origins |
+| `dotenv` | ^16.3.1 | Loading the Supabase keys from `supabase/.env` |
+| `@supabase/supabase-js` | ^2.39.0 | The normal and admin Supabase clients used by the migration script |
+| `nodemon` | ^3.0.2 | Restarting the server on changes during development (`npm run dev`) |
+
+## External services
+
+- **Mapbox:** map tiles, four custom map styles and geocoding (place search
+  and reverse geocoding).
+- **Google Places API:** a second source for place search results.
+- **Google Directions API:** route options between two places.
+- **Supabase:** the PostgreSQL database with row level security, Realtime for
+  live device positions, and the `task-images` Storage bucket.
+
+## Development tools
+
+- Git and GitHub for version control
+- `flutter_lints` (^5.0.0) and `flutter analyze` for static checks
+- `flutter_test` for widget tests
+- npm for the backend packages and scripts
 
 ## Project structure
 
