@@ -254,7 +254,7 @@ class NotificationService {
         debugPrint('  Point ${String.fromCharCode(65 + i)}: (${polygon[i]['lat']}, ${polygon[i]['lng']})');
       }
 
-      bool result = _pointInPolygon(latitude, longitude, polygon);
+      bool result = pointInPolygon(latitude, longitude, polygon);
       debugPrint('Point-in-polygon result: $result');
       
       return result;
@@ -265,7 +265,8 @@ class NotificationService {
   }
 
   // Ray casting algorithm to determine if point is inside polygon
-  static bool _pointInPolygon(double lat, double lng, List<Map<String, double>> polygon) {
+  @visibleForTesting
+  static bool pointInPolygon(double lat, double lng, List<Map<String, double>> polygon) {
   int intersectCount = 0;
   int n = polygon.length;
   
@@ -284,7 +285,7 @@ class NotificationService {
       lat1 = lat2;
       lng1 = lng2;
       lat2 = tempLat;
-      lng2 = tempLat;
+      lng2 = tempLng;
     }
     
     // Check if point is on the same horizontal line as the edge
@@ -337,8 +338,8 @@ class NotificationService {
         };
       }).toList();
 
-      bool isInOriginal = _pointInPolygon(latitude, longitude, originalPolygon);
-      bool isInExpanded = _pointInPolygon(latitude, longitude, expandedPolygon);
+      bool isInOriginal = pointInPolygon(latitude, longitude, originalPolygon);
+      bool isInExpanded = pointInPolygon(latitude, longitude, expandedPolygon);
 
       if (isInOriginal) {
         debugPrint('Point is clearly inside original polygon');
