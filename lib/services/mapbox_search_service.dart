@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 
 class MapboxSearchResult {
   final String placeName;
@@ -158,7 +159,7 @@ class MapboxSearchService {
 
           // Consider it a duplicate if within 100 meters and similar name
           if (distance < 100 &&
-              _isSimilarName(result.placeName, existingResult.placeName)) {
+              isSimilarName(result.placeName, existingResult.placeName)) {
             duplicateKey = existingKey;
             break;
           }
@@ -418,7 +419,8 @@ class MapboxSearchService {
   }
 
   // Helper method to check if two place names are similar 
-  static bool _isSimilarName(String name1, String name2) {
+  @visibleForTesting
+  static bool isSimilarName(String name1, String name2) {
     final clean1 = name1.toLowerCase().trim();
     final clean2 = name2.toLowerCase().trim();
 
@@ -498,7 +500,7 @@ class MapboxSearchService {
           );
 
           if (distance < 100 &&
-              _isSimilarName(result.placeName, existingResult.placeName)) {
+              isSimilarName(result.placeName, existingResult.placeName)) {
             duplicateKey = existingKey;
             break;
           }
