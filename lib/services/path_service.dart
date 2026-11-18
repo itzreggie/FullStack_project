@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mp;
-import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 
 class PathService {
   // Remove hardcoded coordinates and make them dynamic
@@ -129,12 +128,6 @@ class PathService {
     
     // Fit the map view to include all route coordinates
     if (routesToDisplay.isNotEmpty) {
-      final bounds = mp.CoordinateBounds(
-        southwest: mp.Point(coordinates: mp.Position(sourceLongitude!, sourceLatitude!)),
-        northeast: mp.Point(coordinates: mp.Position(destinationLongitude!, destinationLatitude!)),
-        infiniteBounds: false
-      );
-      
       final cameraOptions = mp.CameraOptions(
         center: mp.Point(
           coordinates: mp.Position(

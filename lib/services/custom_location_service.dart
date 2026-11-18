@@ -39,7 +39,6 @@ class CustomLocationService {
   static List<mp.CircleAnnotation?> _customPulseCircles = [];
   static RealtimeChannel? _realtimeSubscription;
   static mp.MapboxMap? _mapController;
-  static AnimationController? _pulseController;
   static Map<int, int> _deviceIdToIndexMap = {};
   
   // Animation-related fields
@@ -50,7 +49,6 @@ class CustomLocationService {
     if (mapboxMapController == null) return;
 
     _mapController = mapboxMapController;
-    _pulseController = pulseController;
 
     _customPointAnnotationManagers.clear();
     _customImageAnnotations.clear();
@@ -409,6 +407,5 @@ class CustomLocationService {
     _customPulseCircles.clear();
     _deviceIdToIndexMap.clear();
     _mapController = null;
-    _pulseController = null;
   }
 }

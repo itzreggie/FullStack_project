@@ -9,7 +9,6 @@ import 'device_info_service.dart';
 class DeviceLocation {
   static final Random _random = Random();
   static Timer? _locationUpdateTimer;
-  static String? _currentDeviceId;
   static String? _deviceName;
   static String? _deviceHardwareId;
   static const String deviceIdKey = 'device_location_id'; // Key for storing device ID in SharedPreferences
@@ -88,7 +87,6 @@ class DeviceLocation {
   
   // Start tracking device location and update database
   static void startTracking(String deviceId) async {
-    _currentDeviceId = deviceId;
     
     // Initialize device info if not already done
     if (_deviceName == null || _deviceHardwareId == null) {
@@ -155,7 +153,6 @@ class DeviceLocation {
   static void stopTracking() {
     _locationUpdateTimer?.cancel();
     _locationUpdateTimer = null;
-    _currentDeviceId = null;
     debugPrint('Stopped location tracking');
   }
   

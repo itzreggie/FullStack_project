@@ -307,7 +307,7 @@ class SupabaseService {
       final fileName = 'task_$timestamp.$extension';
 
       // Upload to Supabase Storage
-      final String filePath = await client.storage
+      await client.storage
           .from('task-images')
           .upload(fileName, imageFile);
 
@@ -379,8 +379,6 @@ class SupabaseService {
       }
 
       final dateString = date.toIso8601String().split('T')[0];
-      final today = DateTime.now();
-      final todayString = today.toIso8601String().split('T')[0];
 
       // Get direct tasks for this date
       final directTasks = await client
@@ -462,7 +460,7 @@ class SupabaseService {
       if (isRecurring && taskDate != null) {
         // For recurring tasks, we need to create a separate record for the specific date
         // to track its completion status independently
-        final originalTask = await client
+        await client
             .from('task_list')
             .select()
             .eq('id', taskId)

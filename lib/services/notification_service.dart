@@ -235,35 +235,6 @@ class NotificationService {
     }
   }
 
-  // Check if a point is inside a bounding box polygon using ray casting algorithm
-  static bool _isPointInBoundingBox({
-    required double latitude,
-    required double longitude,
-    required Map<String, dynamic> boundingBox,
-  }) {
-    try {
-      final List<Map<String, double>> polygon = [
-        {'lat': boundingBox['point_a_lat'].toDouble(), 'lng': boundingBox['point_a_lng'].toDouble()},
-        {'lat': boundingBox['point_b_lat'].toDouble(), 'lng': boundingBox['point_b_lng'].toDouble()},
-        {'lat': boundingBox['point_c_lat'].toDouble(), 'lng': boundingBox['point_c_lng'].toDouble()},
-        {'lat': boundingBox['point_d_lat'].toDouble(), 'lng': boundingBox['point_d_lng'].toDouble()},
-      ];
-
-      debugPrint('Checking point ($latitude, $longitude) against polygon:');
-      for (int i = 0; i < polygon.length; i++) {
-        debugPrint('  Point ${String.fromCharCode(65 + i)}: (${polygon[i]['lat']}, ${polygon[i]['lng']})');
-      }
-
-      bool result = pointInPolygon(latitude, longitude, polygon);
-      debugPrint('Point-in-polygon result: $result');
-      
-      return result;
-    } catch (e) {
-      debugPrint('Error checking point in bounding box: $e');
-      return false;
-    }
-  }
-
   // Ray casting algorithm to determine if point is inside polygon
   @visibleForTesting
   static bool pointInPolygon(double lat, double lng, List<Map<String, double>> polygon) {

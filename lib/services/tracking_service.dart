@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'device_location.dart';
 import 'supabase_service.dart';
 import 'background_location_service.dart';
