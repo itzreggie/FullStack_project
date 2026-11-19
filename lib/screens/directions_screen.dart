@@ -58,7 +58,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
               dialHandColor: Colors.blue,
               hourMinuteColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.blue.withOpacity(0.2);
+                  return Colors.blue.withValues(alpha: 0.2);
                 }
                 return Colors.grey.shade400;
               }),
@@ -95,7 +95,7 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
               dialHandColor: Colors.blue,
               hourMinuteColor: WidgetStateColor.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.blue.withOpacity(0.2);
+                  return Colors.blue.withValues(alpha: 0.2);
                 }
                 return Colors.grey.shade400;
               }),
@@ -130,10 +130,10 @@ class _DirectionsScreenState extends State<DirectionsScreen> {
               // Top bar with all controls (fixed at top)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95),
+                  color: Colors.white.withValues(alpha: 0.95),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
