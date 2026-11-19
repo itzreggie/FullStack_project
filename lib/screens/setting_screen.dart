@@ -5,7 +5,6 @@ import '../services/device_location.dart';
 import '../services/supabase_service.dart';
 import '../services/tracking_service.dart';
 import '../screens/map_screen.dart';
-import '../services/custom_location_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Settingpage extends StatefulWidget {
@@ -204,8 +203,6 @@ class _SettingpageState extends State<Settingpage> {
                           if (uppercaseValue != value) {
                             // If there was a conversion, update the controller
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              TextEditingController controller = TextEditingController(text: uppercaseValue)
-                                ..selection = TextSelection.fromPosition(TextPosition(offset: uppercaseValue.length));
                               setState(() {});
                             });
                           }
@@ -304,7 +301,6 @@ class _SettingpageState extends State<Settingpage> {
                                   .single();
                                 
                                 final myDeviceId = myDeviceInfo['id'];
-                                final myGeneratedId = myDeviceInfo['generated_id'];
                                 
                                 // Check if target device exists
                                 final targetDeviceExists = await SupabaseService.client

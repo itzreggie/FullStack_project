@@ -20,7 +20,6 @@ class BoundingBoxWidget extends StatefulWidget {
   
   static mp.PointAnnotationManager? _greenDotManager;
   static mp.PolygonAnnotationManager? _polygonManager;
-  static mp.PolygonAnnotation? _boundingBoxPolygon;
   
   // Store current coordinates for dragging
   static double? _topLeftLat;
@@ -78,9 +77,6 @@ class BoundingBoxWidget extends StatefulWidget {
     }
     
     if (lat == null || lng == null) return false;
-    
-    // Convert screen position to map coordinates
-    final screenCoord = mp.ScreenCoordinate(x: position.dx, y: position.dy);
     
     // Convert the corner's marker position to screen coordinates
     final markerPosition = await mapController.pixelForCoordinate(
@@ -175,7 +171,7 @@ class BoundingBoxWidget extends StatefulWidget {
       }
       
       // Create new polygon and store reference
-      _boundingBoxPolygon = await _polygonManager!.create(polygonOptions);
+      await _polygonManager!.create(polygonOptions);
     } catch (e) {
       debugPrint('Error updating dots: $e');
     }
@@ -262,10 +258,6 @@ class BoundingBoxWidget extends StatefulWidget {
   // Check if a screen position is near the top-left dot
   static Future<bool> isNearTopLeftDot(mp.MapboxMap mapController, Offset position) async {
     if (_topLeftLat == null || _topLeftLng == null) return false;
-    
-    // Convert screen position to map coordinates
-    final screenCoord = mp.ScreenCoordinate(x: position.dx, y: position.dy);
-    final mapCoord = await mapController.coordinateForPixel(screenCoord);
     
     // Convert the top-left marker position to screen coordinates
     final markerPosition = await mapController.pixelForCoordinate(

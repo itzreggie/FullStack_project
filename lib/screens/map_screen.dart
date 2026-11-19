@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as gl;
@@ -100,7 +99,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   mp.PointAnnotationManager? _pointAnnotationManager;
   mp.PointAnnotation? _userImageAnnotation;
-  mp.PointAnnotationManager? _greenDotManager;
   Timer? _positionUpdateTimer;
   Timer? _zoomCheckTimer; // Add this new timer for zoom checking
 
@@ -1227,37 +1225,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     } catch (e) {
       debugPrint('Error getting location when exiting safe zone: $e');
       // The safe zone mode is already exited, so we don't need to do anything here
-    }
-  }
-
-  // Method to save the current bounding box to database
-  void _saveBoundingBox() async {
-    if (_currentSafeZoneId == null || _currentSafeZoneName == null) {
-      debugPrint('Cannot save bounding box: No safe zone selected');
-      return;
-    }
-    
-    try {
-      await BoundingBoxWidget.saveBoundingBoxToDatabase(
-        _currentSafeZoneId!,
-        _currentSafeZoneName!,
-      );
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Bounding box saved successfully!'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } catch (e) {
-      debugPrint('Error saving bounding box: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error saving bounding box'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
     }
   }
 
