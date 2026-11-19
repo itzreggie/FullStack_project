@@ -123,7 +123,7 @@ class _SafeZoneToolbarState extends State<SafeZoneToolbar> with SingleTickerProv
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -181,8 +181,8 @@ class _SafeZoneToolbarState extends State<SafeZoneToolbar> with SingleTickerProv
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(24),
-                          splashColor: Colors.grey.withOpacity(0.2),
-                          highlightColor: Colors.grey.withOpacity(0.1),
+                          splashColor: Colors.grey.withValues(alpha: 0.2),
+                          highlightColor: Colors.grey.withValues(alpha: 0.1),
                           onTap: () {
                             debugPrint('Map toggle button tapped');
                             setState(() {
