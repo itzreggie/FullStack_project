@@ -597,7 +597,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     try {
       // Get current location
       final position = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
 
       // Create pulse circle manager if needed
@@ -783,7 +783,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
       // Permission granted - get location and animate
       final position = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
 
       // Update location component settings to DISABLE the default blue/white puck
@@ -870,7 +870,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     try {
       // Get the user's current location
       final position = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
 
       // Animate camera to user's location with the same animation as location button
@@ -1077,7 +1077,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     ) async {
       try {
         final position = await gl.Geolocator.getCurrentPosition(
-          desiredAccuracy: gl.LocationAccuracy.high,
+          locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
         );
         _updateImageAnnotationPosition(position);
       } catch (e) {
@@ -1195,7 +1195,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     // Continue with camera animation in the background
     try {
       final position = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
       
       // First animate to user location (keeping pitch at 0)

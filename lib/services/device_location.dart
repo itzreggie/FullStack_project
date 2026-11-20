@@ -123,7 +123,7 @@ class DeviceLocation {
         
         // Get current position
         final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high)
         );
         
         // Update position in database for this device ID

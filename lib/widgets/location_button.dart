@@ -46,7 +46,7 @@ class _LocationButtonState extends State<LocationButton> {
     try {
       // Get current user position
       final userPosition = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
 
       // Get current camera position
@@ -165,7 +165,7 @@ class _LocationButtonState extends State<LocationButton> {
 
       // Get the user's current location
       final position = await gl.Geolocator.getCurrentPosition(
-        desiredAccuracy: gl.LocationAccuracy.high,
+        locationSettings: const gl.LocationSettings(accuracy: gl.LocationAccuracy.high),
       );
 
       // Update location component settings
