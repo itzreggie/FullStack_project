@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:aught/services/device_location.dart';
+import 'package:ahtet/services/device_location.dart';
 
 void main() {
   group('DeviceLocation.generateDeviceId', () {

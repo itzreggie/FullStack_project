@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:aught/services/notification_service.dart';
+import 'package:ahtet/services/notification_service.dart';
 
 void main() {
   // A rough box around central Lappeenranta.

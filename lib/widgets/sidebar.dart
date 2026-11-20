@@ -1,9 +1,9 @@
-import 'package:aught/screens/contactUs_screen.dart';
-import 'package:aught/screens/policyOfPrivacy_screen.dart';
+import 'package:ahtet/screens/contactUs_screen.dart';
+import 'package:ahtet/screens/policyOfPrivacy_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:aught/widgets/SideBarElements/sidebar_button.dart';
-import 'package:aught/screens/notificationHistory_screen.dart';
-import 'package:aught/screens/setting_screen.dart';
+import 'package:ahtet/widgets/SideBarElements/sidebar_button.dart';
+import 'package:ahtet/screens/notificationHistory_screen.dart';
+import 'package:ahtet/screens/setting_screen.dart';
 
 class Sidebar extends StatelessWidget {
   final VoidCallback onClose;

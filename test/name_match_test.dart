@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:aught/services/mapbox_search_service.dart';
+import 'package:ahtet/services/mapbox_search_service.dart';
 
 void main() {
   group('MapboxSearchService.isSimilarName', () {
