@@ -304,7 +304,13 @@ class SupabaseService {
       // Generate unique filename
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final extension = imageFile.path.split('.').last;
-      final fileName = 'task_$timestamp.$extension';
+      final userId = client.auth.currentUser?.id;
+      if (userId == null) {
+        debugPrint('Cannot upload image: no signed in user');
+        return null;
+      }
+      // The storage policy only allows uploads into the user's own folder
+      final fileName = '$userId/task_$timestamp.$extension';
 
       // Upload to Supabase Storage
       await client.storage
