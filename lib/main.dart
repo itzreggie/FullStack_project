@@ -1,9 +1,12 @@
 import '../screens/map_screen.dart';
 import '../screens/Home_screen.dart';
+import '../screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'services/supabase_service.dart';
+import 'services/auth_service.dart';
 import 'services/tracking_service.dart';
 import 'services/device_location.dart';
 import 'services/background_location_service.dart';
@@ -77,9 +80,31 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => AppLifecycleObserver(child: const MapScreen()),
+        '/': (context) => const AuthGate(),
         '/map': (context) => AppLifecycleObserver(child: const MapScreen()),
         '/home': (context) => const HomeScreen(),
+      },
+    );
+  }
+}
+
+// Shows the login screen until a user is signed in, then the map
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!SupabaseService.isInitialized) {
+      return AppLifecycleObserver(child: const MapScreen());
+    }
+
+    return StreamBuilder<AuthState>(
+      stream: AuthService.authStateChanges,
+      builder: (context, snapshot) {
+        if (!AuthService.isSignedIn) {
+          return const LoginScreen();
+        }
+        return AppLifecycleObserver(child: const MapScreen());
       },
     );
   }
