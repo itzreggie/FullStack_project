@@ -4,11 +4,40 @@ import 'package:flutter/material.dart';
 import 'package:ahtet/widgets/SideBarElements/sidebar_button.dart';
 import 'package:ahtet/screens/notificationHistory_screen.dart';
 import 'package:ahtet/screens/setting_screen.dart';
+import 'package:ahtet/services/auth_service.dart';
+import 'package:ahtet/services/device_location.dart';
 
 class Sidebar extends StatelessWidget {
   final VoidCallback onClose;
 
   const Sidebar({super.key, required this.onClose});
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Sign out?'),
+        content: const Text('Location sharing stops until you sign in again.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    DeviceLocation.stopTracking();
+    onClose();
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    await AuthService.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +161,22 @@ class Sidebar extends StatelessWidget {
                     indent: 16,
                     endIndent: 16,
                   ),
+                  SidebarButton(
+                    icon: Icons.logout,
+                    label: 'Sign Out',
+                    onTap: () => _confirmSignOut(context),
+                  ),
                 ],
               ),
             ),
+            if (AuthService.currentUser?.email != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  'Signed in as ${AuthService.currentUser!.email}',
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              ),
             // Company logo at the bottom
             Padding(
               padding: const EdgeInsets.only(bottom: 10.0),
