@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'device_location.dart';
 import 'supabase_service.dart';
+import 'auth_service.dart';
 import 'background_location_service.dart';
 
 class TrackingService {
@@ -61,6 +62,13 @@ class TrackingService {
           if (!SupabaseService.isInitialized) {
             await SupabaseService.initialize();
           }
+
+          if (!AuthService.isSignedIn) {
+            debugPrint('Cannot start tracking: no signed in user');
+            _isTrackingEnabled = false;
+            trackingStatus.value = false;
+            return;
+          }
           
           // Get actual device name and hardware ID
           final deviceName = await DeviceLocation.getDeviceName();
@@ -76,6 +84,7 @@ class TrackingService {
           if (response == null) {
             // Add new device entry if it doesn't exist
             await SupabaseService.client.from('device_locations').insert({
+              'user_id': AuthService.currentUser?.id,
               'device_id': deviceHardwareId,
               'device_name': deviceName,
               'generated_id': deviceCode.replaceAll('-', ''),

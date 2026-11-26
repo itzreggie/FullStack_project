@@ -2,7 +2,7 @@ import '../screens/map_screen.dart';
 import '../screens/Home_screen.dart';
 import '../screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthState;
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent, AuthState;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'services/supabase_service.dart';
@@ -103,6 +103,9 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (!AuthService.isSignedIn) {
           return const LoginScreen();
+        }
+        if (snapshot.data?.event == AuthChangeEvent.signedIn) {
+          TrackingService().initialize();
         }
         return AppLifecycleObserver(child: const MapScreen());
       },
