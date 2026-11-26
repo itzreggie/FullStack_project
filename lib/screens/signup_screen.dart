@@ -47,7 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.of(context).pop();
     } catch (e) {
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage = AuthService.errorMessage(e);
       });
     } finally {
       if (mounted) {

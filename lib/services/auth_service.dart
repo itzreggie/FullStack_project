@@ -33,4 +33,31 @@ class AuthService {
     await _auth.signOut();
     debugPrint('Signed out');
   }
+
+  // Turn auth errors into short messages for the login and sign up screens
+  static String errorMessage(Object error) {
+    if (error is AuthException) {
+      final message = error.message.toLowerCase();
+      if (message.contains('invalid login credentials')) {
+        return 'Wrong email or password.';
+      }
+      if (message.contains('email not confirmed')) {
+        return 'Confirm your email before signing in.';
+      }
+      if (message.contains('already registered')) {
+        return 'An account with this email already exists.';
+      }
+      if (message.contains('password')) {
+        return 'The password is too weak. Use at least 6 characters.';
+      }
+      if (error.statusCode == '429') {
+        return 'Too many attempts. Wait a moment and try again.';
+      }
+      return error.message;
+    }
+    if (error.toString().contains('SocketException')) {
+      return 'No internet connection.';
+    }
+    return 'Something went wrong. Please try again.';
+  }
 }
