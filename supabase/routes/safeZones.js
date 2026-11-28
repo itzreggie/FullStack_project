@@ -42,4 +42,56 @@ router.delete('/:id', wrap(async (req, res) => {
     res.status(204).end();
 }));
 
+// Create or replace the four corner border of a safe zone
+router.put('/:id/bounding-box', wrap(async (req, res) => {
+    const safeZoneId = requireId(req.params.id);
+    const now = new Date().toISOString();
+
+    const box = { safe_zone_id: safeZoneId, updated_at: now };
+    for (const point of ['a', 'b', 'c', 'd']) {
+        const upper = point.toUpperCase();
+        box[`point_${point}_lat`] = requireLat(req.body, `point${upper}Lat`);
+        box[`point_${point}_lng`] = requireLng(req.body, `point${upper}Lng`);
+    }
+    box.location_name = requireString(req.body, 'locationName', { optional: true });
+
+    const { data: zone, error: zoneError } = await req.db
+        .from('safe_zone')
+        .select('id')
+        .eq('id', safeZoneId)
+        .maybeSingle();
+    if (zoneError) throw zoneError;
+    if (!zone) {
+        return res.status(404).json({ error: 'Safe zone not found' });
+    }
+
+    const { data: existing, error: existingError } = await req.db
+        .from('bounding_box')
+        .select('id')
+        .eq('safe_zone_id', safeZoneId)
+        .maybeSingle();
+    if (existingError) throw existingError;
+
+    if (existing) {
+        const { data, error } = await req.db
+            .from('bounding_box')
+            .update(box)
+            .eq('id', existing.id)
+            .select()
+            .single();
+        if (error) throw error;
+        return res.json(data);
+    }
+
+    box.created_at = now;
+    const { data, error } = await req.db
+        .from('bounding_box')
+        .insert(box)
+        .select()
+        .single();
+    if (error) throw error;
+
+    res.status(201).json(data);
+}));
+
 module.exports = router;
