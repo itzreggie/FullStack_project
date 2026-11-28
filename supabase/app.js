@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { requireAuth } = require('./middleware/auth');
 const devicesRouter = require('./routes/devices');
+const safeZonesRouter = require('./routes/safeZones');
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/devices', requireAuth, devicesRouter);
+app.use('/api/safe-zones', requireAuth, safeZonesRouter);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
