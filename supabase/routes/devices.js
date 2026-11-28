@@ -1,6 +1,6 @@
 const express = require('express');
 const { supabaseAdmin } = require('../supabase/client');
-const { requireDeviceCode, badRequest } = require('../lib/validate');
+const { requireDeviceCode, requireId, requireString, badRequest } = require('../lib/validate');
 
 const router = express.Router();
 
@@ -74,6 +74,41 @@ router.post('/connect', wrap(async (req, res) => {
     if (error) throw error;
 
     res.status(201).json(data);
+}));
+
+// Rename a connection. Row level security makes sure it belongs to the user.
+router.patch('/connections/:id', wrap(async (req, res) => {
+    const id = requireId(req.params.id);
+    const name = requireString(req.body, 'connectionName', { maxLength: 50 });
+
+    const { data, error } = await req.db
+        .from('connected_devices')
+        .update({ connection_name: name })
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) {
+        return res.status(404).json({ error: 'Connection not found' });
+    }
+
+    res.json(data);
+}));
+
+router.delete('/connections/:id', wrap(async (req, res) => {
+    const id = requireId(req.params.id);
+
+    const { data, error } = await req.db
+        .from('connected_devices')
+        .delete()
+        .eq('id', id)
+        .select('id');
+    if (error) throw error;
+    if (data.length === 0) {
+        return res.status(404).json({ error: 'Connection not found' });
+    }
+
+    res.status(204).end();
 }));
 
 module.exports = router;
