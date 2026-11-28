@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const { requireAuth } = require('./middleware/auth');
+const devicesRouter = require('./routes/devices');
 
 const app = express();
 
@@ -9,6 +11,8 @@ app.use(express.json());
 app.get('/health', (req, res) => {
     res.json({ status: 'Backend is running', timestamp: new Date().toISOString() });
 });
+
+app.use('/api/devices', requireAuth, devicesRouter);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
