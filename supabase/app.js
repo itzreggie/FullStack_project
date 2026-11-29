@@ -1,13 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const { requireAuth } = require('./middleware/auth');
+const { requestLogger } = require('./middleware/logger');
 const devicesRouter = require('./routes/devices');
 const safeZonesRouter = require('./routes/safeZones');
 
 const app = express();
 
+app.use(requestLogger);
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
 app.get('/health', (req, res) => {
     res.json({ status: 'Backend is running', timestamp: new Date().toISOString() });
