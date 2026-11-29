@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/device_location.dart';
 import '../services/supabase_service.dart';
+import '../services/api_service.dart';
 import '../services/tracking_service.dart';
 import '../screens/map_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -293,61 +294,19 @@ class _SettingpageState extends State<Settingpage> {
                               }
                               
                               try {
-                                // Get my device info (the one connecting)
-                                final myDeviceInfo = await SupabaseService.client
-                                  .from('device_locations')
-                                  .select('id, generated_id')
-                                  .eq('generated_id', _deviceCode.replaceAll('-', ''))
-                                  .single();
-                                
-                                final myDeviceId = myDeviceInfo['id'];
-                                
-                                // Check if target device exists
-                                final targetDeviceExists = await SupabaseService.client
-                                  .from('device_locations')
-                                  .select('id, generated_id')
-                                  .eq('generated_id', cleanCode)
-                                  .maybeSingle();
-                                  
-                                if (targetDeviceExists == null) {
+                                // The backend finds the other device, which this user cannot read directly
+                                try {
+                                  await ApiService.connectDevice(
+                                    myDeviceCode: _deviceCode,
+                                    targetCode: cleanCode,
+                                  );
+                                } on ApiException catch (e) {
                                   setState(() {
-                                    errorMessage = 'The code provided does not exist';
+                                    errorMessage = e.message;
                                   });
                                   return;
                                 }
 
-                                final targetDeviceId = targetDeviceExists['id'];
-                                
-                                // Check if connection already exists between these two devices
-                                final existingConnection = await SupabaseService.client
-                                  .from('connected_devices')
-                                  .select()
-                                  .eq('device_location_id', myDeviceId)
-                                  .eq('connected_device_id', targetDeviceId)
-                                  .maybeSingle();
-                                  
-                                if (existingConnection != null) {
-                                  // Update existing connection with new generated_id
-                                  await SupabaseService.client
-                                    .from('connected_devices')
-                                    .update({
-                                      'generated_id': cleanCode,
-                                      'last_connected': DateTime.now().toIso8601String()
-                                    })
-                                    .eq('id', existingConnection['id']);
-                                } else {
-                                  // Create new connection
-                                  await SupabaseService.client
-                                    .from('connected_devices')
-                                    .insert({
-                                      'device_location_id': myDeviceId,
-                                      'generated_id': cleanCode,
-                                      'connected_device_id': targetDeviceId,
-                                      'last_connected': DateTime.now().toIso8601String(),
-                                      'created_at': DateTime.now().toIso8601String()
-                                    });
-                                }
-                                
                                 if (context.mounted) {
                                   Navigator.of(context).pop();
                                   ScaffoldMessenger.of(context).showSnackBar(
