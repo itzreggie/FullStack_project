@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/supabase_service.dart';
+import '../services/api_service.dart';
 
 class SafeZoneList extends StatefulWidget {
   const SafeZoneList({super.key});
@@ -223,10 +224,7 @@ class _SafeZoneListState extends State<SafeZoneList> {
 
   Future<void> _deleteSafeZone(int safeZoneId) async {
     try {
-      await SupabaseService.client
-        .from('safe_zone')
-        .delete()
-        .eq('id', safeZoneId);
+      await ApiService.deleteSafeZone(safeZoneId);
       
       setState(() {
         _safeZonesFuture = _fetchSafeZones();

@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'api_service.dart';
 import 'dart:typed_data';
 
 class SupabaseService {
@@ -124,13 +125,16 @@ class SupabaseService {
         throw Exception('Could not initialize Supabase service');
       }
 
-      await client.from('safe_zone').insert({
-        'location_name': locationName,
-        'location_address': locationAddress ?? '',
-        'location_lat': locationLat,
-        'location_lng': locationLng,
-        'created_at': DateTime.now().toIso8601String(),
-      });
+      if (locationLat == null || locationLng == null) {
+        throw Exception('A safe zone needs coordinates');
+      }
+
+      await ApiService.createSafeZone(
+        locationName: locationName,
+        locationAddress: locationAddress,
+        locationLat: locationLat,
+        locationLng: locationLng,
+      );
       
       debugPrint('Safe zone saved successfully to safe_zone table');
     } catch (e) {
