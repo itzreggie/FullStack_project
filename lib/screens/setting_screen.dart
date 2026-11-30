@@ -501,12 +501,7 @@ class _SettingpageState extends State<Settingpage> {
                           if (newName.isNotEmpty) {
                             // Update connection name in database
                             try {
-                              await SupabaseService.client
-                                .from('connected_devices')
-                                .update({
-                                  'connection_name': newName,
-                                })
-                                .eq('id', device['id']);
+                              await ApiService.renameConnection(device['id'], newName);
                                 
                               // Refresh the list
                               if (context.mounted) {
@@ -560,13 +555,7 @@ class _SettingpageState extends State<Settingpage> {
   // Method to clear the connection name
   void _clearConnectionName(Map<String, dynamic> device) async {
     try {
-      // Update the database to set connection_name to null
-      await SupabaseService.client
-        .from('connected_devices')
-        .update({
-          'connection_name': null,
-        })
-        .eq('id', device['id']);
+      await ApiService.renameConnection(device['id'], null);
       
       // Refresh the devices list
       _loadConnectedDevices();
@@ -653,10 +642,7 @@ class _SettingpageState extends State<Settingpage> {
                 
                 if (existingConnection != null) {
                   // Delete the connection from database
-                  await SupabaseService.client
-                    .from('connected_devices')
-                    .delete()
-                    .eq('id', existingConnection['id']);
+                  await ApiService.deleteConnection(existingConnection['id']);
                   
                   // Update our local tracking map
                   trackedDeviceIds.remove(updatedDeviceId);

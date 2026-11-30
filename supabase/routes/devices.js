@@ -76,10 +76,11 @@ router.post('/connect', wrap(async (req, res) => {
     res.status(201).json(data);
 }));
 
-// Rename a connection. Row level security makes sure it belongs to the user.
+// Rename a connection, or clear the name with null.
+// Row level security makes sure it belongs to the user.
 router.patch('/connections/:id', wrap(async (req, res) => {
     const id = requireId(req.params.id);
-    const name = requireString(req.body, 'connectionName', { maxLength: 50 });
+    const name = requireString(req.body, 'connectionName', { maxLength: 50, optional: true });
 
     const { data, error } = await req.db
         .from('connected_devices')

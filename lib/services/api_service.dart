@@ -62,7 +62,8 @@ class ApiService {
     return Map<String, dynamic>.from(data);
   }
 
-  static Future<void> renameConnection(int connectionId, String name) async {
+  // A null name clears it so the device name shows again
+  static Future<void> renameConnection(int connectionId, String? name) async {
     await _request('PATCH', '/api/devices/connections/$connectionId', {
       'connectionName': name,
     });
